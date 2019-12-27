@@ -1,40 +1,41 @@
 const express = require('express');
 const auth = require('../middleware/auth');
-const Folder = require('../models/folder');
+const Media = require('../models/media');
 
 const router = express.Router();
 
-router.post('/folders', auth, async (req, res) => {
-    // Create a new folder
+router.post('/media', auth, async (req, res) => {
+    // Create a new media
+    console.log(req.body, req.files);
     const user = req.user;
     const owner_id = user._id;
     try {
-        const folder = new Folder({ ...req.body, owner_id });
-        await folder.save();
-        res.status(201).send({ folder });
+        const media = new Media({ ...req.fields, ...req.files, owner_id });
+        await media.save();
+        res.status(201).send({ media });
     } catch (error) {
         res.status(400).send(error);
     }
 });
 
-router.get('/folders', auth, async (req, res) => {
+router.get('/media', auth, async (req, res) => {
     // Get all folders
     const user = req.user;
     const owner_id = user._id;
     try {
-        const folders = await Folder.find({ owner_id });
+        const folders = await Media.find({ owner_id });
         res.status(200).send(folders);
     } catch (error) {
         res.status(400).send(error);
     }
 });
 
-router.patch('/folders/:id', auth, async (req, res) => {
+router.patch('/media/:id', auth, async (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
     try {
-        const folder = await Folder.renameById(id, name);
-        res.status(200).send(folder);
+        const media = await Media.renameById(id, name);
+        res.status(200).send(media);
         
     } catch (error) {
         console.log(error);
@@ -43,14 +44,14 @@ router.patch('/folders/:id', auth, async (req, res) => {
     }
 });
 
-router.delete('/folders/:id', auth, async (req, res) => {
+router.delete('/media/:id', auth, async (req, res) => {
     const { id } = req.params;
     try {
-        await Folder.deleteById(id);
+        await Media.deleteById(id);
         res.status(200);
     } catch (error) {
         res.status(404).send(error);
     }
-})
+});
 
 module.exports = router;

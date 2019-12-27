@@ -1,9 +1,11 @@
 const mongoose = require('mongoose');
+const autoIncrement = require('mongoose-sequence')(mongoose);
 // const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const userSchema = mongoose.Schema({
+    _id: Number,
     username: {
         type: String,
         required: true,
@@ -21,7 +23,9 @@ const userSchema = mongoose.Schema({
             required: true
         }
     }]
-});
+}, { _id: false });
+
+userSchema.plugin(autoIncrement, { id: 'user' });
 
 userSchema.pre('save', async function (next) {
     // Hash the password before saving the user model

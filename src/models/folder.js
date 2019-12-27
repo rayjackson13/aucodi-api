@@ -10,14 +10,12 @@ const folderSchema = mongoose.Schema({
         required: true,
         trim: true
     },
-    files: [{
-        media: {
-            type: Object
-        }
-    }]
+    owner_id: {
+        type: Number
+    }
 });
 
-folderSchema.plugin(autoIncrement, { id: 'order_seq', inc_field: 'id' });
+folderSchema.plugin(autoIncrement, { id: 'folders', inc_field: 'id' });
 
 folderSchema.statics.renameById = async (id, name) => {
     const folder = await Folder.findOneAndUpdate({ id }, { name }, { new: true });
@@ -27,18 +25,13 @@ folderSchema.statics.renameById = async (id, name) => {
     return folder;
 };
 
-// userSchema.statics.findByCredentials = async (username, password) => {
-//     // Search for a user by username and password.
-//     const user = await User.findOne({ username} );
-//     if (!user) {
-//         throw new Error({ error: 'Invalid login credentials' });
-//     }
-//     const isPasswordMatch = await bcrypt.compare(password, user.password);
-//     if (!isPasswordMatch) {
-//         throw new Error({ error: 'Invalid login credentials' });
-//     }
-//     return user;
-// };
+folderSchema.statics.deleteById = async id => {
+    const folder = await Folder.findOneAndDelete({ id });
+    if (!folder) {
+        throw new Error({error: 'No such folder available.'});
+    }
+    return folder;
+};
 
 const Folder = mongoose.model('Folder', folderSchema);
 
