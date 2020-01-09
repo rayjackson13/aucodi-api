@@ -37,7 +37,6 @@ router.patch('/folders/:id', auth, async (req, res) => {
         res.status(200).send(folder);
         
     } catch (error) {
-        console.log(error);
         res.status(404).send(error);
         
     }
@@ -51,6 +50,6 @@ router.delete('/folders/:id', auth, async (req, res) => {
     } catch (error) {
         res.status(404).send(error);
     }
-})
+});
 
 module.exports = router;

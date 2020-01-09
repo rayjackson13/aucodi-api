@@ -6,7 +6,6 @@ const router = express.Router();
 
 router.post('/media', auth, async (req, res) => {
     // Create a new media
-    console.log(req.body, req.files);
     const user = req.user;
     const owner_id = user._id;
     try {
@@ -38,7 +37,6 @@ router.patch('/media/:id', auth, async (req, res) => {
         res.status(200).send(media);
         
     } catch (error) {
-        console.log(error);
         res.status(404).send(error);
         
     }

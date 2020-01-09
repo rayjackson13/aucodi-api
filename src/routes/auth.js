@@ -11,22 +11,22 @@ router.post('/users', async (req, res) => {
         const token = await user.generateAuthToken();
         res.status(201).send({token});
     } catch (error) {
-        res.status(400).send(error);
+        res.status(422).send({error: 'This username has been already taken'});
     }
 });
 
 router.post('/users/login', async(req, res) => {
+    const { username, password } = req.body;
     //Login a registered user
     try {
-        const { username, password } = req.body;
         const user = await User.findByCredentials(username, password);
         if (!user) {
-            return res.status(401).send({error: 'Login failed! Check authentication credentials'});
+            return res.status(422).send({error: 'Login failed! Check authentication credentials'});
         }
         const token = await user.generateAuthToken();
         res.send({token});
-    } catch (error) {
-        res.status(400).send(error);
+    } catch (e) {
+        res.status(422).send({error: 'Login failed! Check authentication credentials'});
     }
 
 });
