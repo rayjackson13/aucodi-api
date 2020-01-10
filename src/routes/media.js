@@ -1,20 +1,35 @@
 const express = require('express');
 const auth = require('../middleware/auth');
+const form = require('../middleware/form');
 const Media = require('../models/media');
 
 const router = express.Router();
 
-router.post('/media', auth, async (req, res) => {
+router.post('/media', auth, form, async (req, res) => {
+    res.header('Content-Type', 'multipart/form-data');
     // Create a new media
+    console.log(req.get('content-type'), req.files);
     const user = req.user;
     const owner_id = user._id;
-    try {
-        const media = new Media({ ...req.fields, ...req.files, owner_id });
-        await media.save();
-        res.status(201).send({ media });
-    } catch (error) {
-        res.status(400).send(error);
-    }
+    const {
+        files,
+        body,
+        query,
+        params
+    } = req;
+    res.status(200).send({
+        files,
+        body,
+        query,
+        params
+    });
+    // try {
+    //     const media = new Media({ ...req.fields, ...req.files, owner_id });
+    //     await media.save();
+    //     res.status(201).send({ media });
+    // } catch (error) {
+    //     res.status(400).send(error);
+    // }
 });
 
 router.get('/media', auth, async (req, res) => {

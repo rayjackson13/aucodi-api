@@ -1,5 +1,6 @@
 const express = require('express');
 const User = require('../models/user');
+const Folder = require('../models/folder');
 
 const router = express.Router();
 
@@ -7,7 +8,13 @@ router.post('/users', async (req, res) => {
     // Create a new user
     try {
         const user = new User(req.body);
-        await user.save();
+        const savedUser = await user.save();
+        const defaultFolder = new Folder({
+            id: 0,
+            name: 'Unsorted',
+            owner_id: savedUser['_id']
+        });
+        await defaultFolder.save();
         const token = await user.generateAuthToken();
         res.status(201).send({token});
     } catch (error) {
