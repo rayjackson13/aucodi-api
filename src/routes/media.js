@@ -1,35 +1,37 @@
+const path = require('path');
 const express = require('express');
 const auth = require('../middleware/auth');
 const form = require('../middleware/form');
 const Media = require('../models/media');
+const formidable = require('express-formidable');
 
 const router = express.Router();
 
-router.post('/media', auth, form, async (req, res) => {
-    res.header('Content-Type', 'multipart/form-data');
+router.use('/media', (req, res, next) => formidable({
+    encoding: 'utf-8',
+    multiples: false,
+    keepExtensions: true,
+    uploadDir: path.join(__dirname, '../static/uploads')
+})(req, res, next));
+
+router.post('/media', auth, async (req, res) => {
     // Create a new media
-    console.log(req.get('content-type'), req.files);
-    const user = req.user;
+    const { files, fields, user } = req;
+    const { file } = files;
+    const { name, folder_id } = fields;
     const owner_id = user._id;
-    const {
-        files,
-        body,
-        query,
-        params
-    } = req;
-    res.status(200).send({
-        files,
-        body,
-        query,
-        params
-    });
-    // try {
-    //     const media = new Media({ ...req.fields, ...req.files, owner_id });
-    //     await media.save();
-    //     res.status(201).send({ media });
-    // } catch (error) {
-    //     res.status(400).send(error);
-    // }
+    try {
+        const media = new Media({ 
+            name, 
+            folder_id, 
+            file, 
+            owner_id
+        });
+        await media.save();
+        res.status(201).send({ media });
+    } catch (error) {
+        res.status(400).send(error);
+    }
 });
 
 router.get('/media', auth, async (req, res) => {
